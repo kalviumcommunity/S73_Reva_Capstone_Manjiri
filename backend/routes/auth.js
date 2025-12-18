@@ -212,17 +212,3 @@ module.exports = {
   authenticateToken,
   authorizeRoles
 };
-
-//help me push the code and create prquest
-// To push the code and create a pull request, follow these steps:  
-// 1. Initialize a Git repository (if you haven't already):
-//    git init  
-// 2. Add the files to staging:
-//    git add backend/routes/auth.js
-// 3. Commit the changes:
-//    git commit -m "Add authentication system with JWT"
-// 4. Create a new branch for your changes:
-//    git checkout -b add-auth-system
-// 5. Push the branch to your remote repository:
-//    git push origin add-auth-system
-// 6. Go to your repository on GitHub (or your Git hosting service) and create a new pull request from the branch you just pushed.
