@@ -7,24 +7,33 @@ const documentSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+
     description: {
       type: String,
       default: ""
     },
+
     fileUrl: {
       type: String,
-      required: true
+      required: true,
+      trim: true
     },
-    uploadedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
-    },
+
     category: {
       type: String,
-      default: "general"
+      default: "general",
+      trim: true
+    },
+
+    uploadedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true 
     }
   },
-  { timestamps: true }
+  {
+    timestamps: true
+  }
 );
 
 module.exports = mongoose.model("Document", documentSchema);

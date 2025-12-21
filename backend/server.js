@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const path = require('path');
 const { authRouter } = require('./routes/auth');
+const documentsRouter = require('./routes/documents');
 
 // Import authentication module
 const { authenticateToken, authorizeRoles } = require('./routes/auth');
@@ -17,6 +18,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRouter);
+app.use('/api/documents', documentsRouter);
 
 
 // MongoDB Connection
