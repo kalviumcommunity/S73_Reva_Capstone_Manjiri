@@ -26,7 +26,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/capstone'
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('✅ MongoDB Connected Successfully'))
+.then(() => {console.log('✅ MongoDB Connected Successfully');console.log("📦 Database:", mongoose.connection.name);})
 .catch((err) => console.log('❌ MongoDB Connection Error:', err));
 
 // ==================== SCHEMAS & MODELS ====================
