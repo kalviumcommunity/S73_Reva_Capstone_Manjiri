@@ -96,6 +96,34 @@ router.put(
   }
 );
 
+/* ===================== DELETE ===================== */
+router.delete(
+  "/:id",
+  authenticateToken,
+  authorizeRoles("teacher", "admin"),
+  async (req, res) => {
+    try {
+      const deleted = await Document.findByIdAndDelete(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          message: "Document not found",
+        });
+      }
+
+      res.json({
+        success: true,
+        message: "Document deleted successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+);
+
 module.exports = router;
 
 
