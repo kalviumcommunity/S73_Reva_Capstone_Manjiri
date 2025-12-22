@@ -486,6 +486,11 @@ app.get('/api/statistics', authenticateToken, async (req, res) => {
   }
 });
 
+// Health check
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
@@ -495,8 +500,7 @@ app.use((req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port 5000`);
-  console.log(`📍 API URL: http://localhost:5000`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
   console.log(`🔐 Authentication enabled`);
 });
