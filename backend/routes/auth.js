@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
@@ -38,22 +39,26 @@ const authorizeRoles = (...roles) => {
 // REGISTER
 authRouter.post("/register", async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { username, email, password, fullName, role } = req.body;
 
-    if (!name || !email || !password) {
+    if (!username || !email || !password || !fullName) {
       return res.status(400).json({ message: "All fields required" });
     }
 
-    const exists = await User.findOne({ email });
+    const exists = await User.findOne({ $or: [{ email }, { username }] });
 
     if (exists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // Hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await User.create({
-      name,
+      username,
       email,
-      password,
+      password: hashedPassword,
+      fullName,
       role
     });
 
@@ -72,11 +77,16 @@ authRouter.post("/register", async (req, res) => {
 // LOGIN
 authRouter.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
 
-    if (!user || !(await user.comparePassword(password))) {
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -94,8 +104,15 @@ authRouter.post("/login", async (req, res) => {
 
 // ME
 authRouter.get("/me", authenticateToken, async (req, res) => {
-  const user = await User.findById(req.user.id).select("-password");
-  res.json({ success: true, data: user });
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 /* ===================== EXPORTS ===================== */
@@ -103,5 +120,5 @@ authRouter.get("/me", authenticateToken, async (req, res) => {
 module.exports = {
   authRouter,
   authenticateToken,
-  authorizeRoles
+  authorizeRoles,
 };
