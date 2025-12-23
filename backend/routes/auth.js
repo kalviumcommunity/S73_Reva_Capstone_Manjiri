@@ -1,5 +1,5 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 
@@ -24,12 +24,12 @@ const userSchema = new mongoose.Schema(
 /* ===================== PASSWORD HASH ===================== */
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+  this.password = await bcryptjs.hash(this.password, 10);
   next();
 });
 
 userSchema.methods.comparePassword = function (password) {
-  return bcrypt.compare(password, this.password);
+  return bcryptjs.compare(password, this.password);
 };
 
 userSchema.methods.generateToken = function () {
