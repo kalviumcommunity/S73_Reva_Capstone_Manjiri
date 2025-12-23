@@ -1,7 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 
 const User = require("../models/User");
 
@@ -41,24 +40,37 @@ authRouter.post("/register", async (req, res) => {
   try {
     const { username, email, password, fullName, role } = req.body;
 
-    if (!username || !email || !password || !fullName) {
-      return res.status(400).json({ message: "All fields required" });
+    // ✅ Proper required field validation
+    if (!username) {
+      return res.status(400).json({ message: "Username is required" });
+    }
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    if (!password) {
+      return res.status(400).json({ message: "Password is required" });
+    }
+    if (!fullName) {
+      return res.status(400).json({ message: "Full name is required" });
     }
 
-    const exists = await User.findOne({ $or: [{ email }, { username }] });
+    const exists = await User.findOne({
+      $or: [{ email }, { username }]
+    });
 
     if (exists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password before saving
+    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // ✅ Map fullName → name (schema-safe)
     const user = await User.create({
       username,
       email,
       password: hashedPassword,
-      fullName,
+      name: fullName,
       role
     });
 
@@ -78,6 +90,13 @@ authRouter.post("/register", async (req, res) => {
 authRouter.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    // ✅ Login validation
+    if (!username || !password) {
+      return res
+        .status(400)
+        .json({ message: "Username and password are required" });
+    }
 
     const user = await User.findOne({ username });
 
@@ -120,5 +139,5 @@ authRouter.get("/me", authenticateToken, async (req, res) => {
 module.exports = {
   authRouter,
   authenticateToken,
-  authorizeRoles,
+  authorizeRoles
 };
