@@ -117,7 +117,7 @@ app.use((req, res) => {
 const startServer = async () => {
   try {
     await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb://localhost:27017/capstone',
+      process.env.MONGODB_URI || 'mongodb+srv://revaraspailes73_db_user:qDtX0pLfnoyvKggS@cluster0.dle0452.mongodb.net/s73_reva_capstone?retryWrites=true&w=majority',
       {
         serverSelectionTimeoutMS: 30000
       }
