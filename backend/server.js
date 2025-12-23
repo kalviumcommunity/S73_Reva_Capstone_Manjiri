@@ -116,23 +116,24 @@ app.use((req, res) => {
 
 const startServer = async () => {
   try {
-    await mongoose.connect(
-      process.env.MONGODB_URI || 'mongodb+srv://revaraspailes73_db_user:qDtX0pLfnoyvKggS@cluster0.dle0452.mongodb.net/s73_reva_capstone?retryWrites=true&w=majority',
-      {
-        serverSelectionTimeoutMS: 30000
-      }
-    );
+    if (!process.env.MONGODB_URI) {
+      throw new Error("MONGODB_URI is not defined in environment variables");
+    }
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 30000
+    });
 
     console.log('✅ MongoDB Connected Successfully');
     console.log('📦 Database:', mongoose.connection.name);
 
     app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
+      console.log(`🚀 Server is running on port 5000`);
       console.log(`🔐 Authentication enabled`);
     });
 
   } catch (error) {
-    console.error('❌ MongoDB Connection Error:', error);
+    console.error('❌ MongoDB Connection Error:', error.message);
     process.exit(1);
   }
 };
