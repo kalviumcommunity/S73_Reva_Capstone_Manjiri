@@ -2,7 +2,8 @@
 
 ## 👨‍💻 Project by: Reva
 **Squad:** S73  
-**GitHub:** [Your GitHub Username]
+**GitHub:** Reva174
+**Render link:** https://s73-reva-capstone-manjiri.onrender.com
 
 ---
 
