@@ -1,5 +1,4 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
@@ -35,42 +34,40 @@ const authorizeRoles = (...roles) => {
 
 /* ===================== ROUTES ===================== */
 
-// REGISTER
+/* ---------- REGISTER ---------- */
+/*
+Expected body:
+{
+  "username": "reva123",
+  "email": "reva123@gmail.com",
+  "password": "password123",
+  "fullName": "Reva Sharma",
+  "role": "student"
+}
+*/
 authRouter.post("/register", async (req, res) => {
   try {
     const { username, email, password, fullName, role } = req.body;
 
-    // ✅ Proper required field validation
-    if (!username) {
-      return res.status(400).json({ message: "Username is required" });
-    }
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-    if (!password) {
-      return res.status(400).json({ message: "Password is required" });
-    }
-    if (!fullName) {
-      return res.status(400).json({ message: "Full name is required" });
+    if (!username || !email || !password || !fullName) {
+      return res.status(400).json({
+        message: "username, email, password and fullName are required"
+      });
     }
 
-    const exists = await User.findOne({
+    const existingUser = await User.findOne({
       $or: [{ email }, { username }]
     });
 
-    if (exists) {
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // ✅ Map fullName → name (schema-safe)
     const user = await User.create({
       username,
       email,
-      password: hashedPassword,
-      name: fullName,
+      password, // 🔥 hashed automatically by model
+      fullName,
       role
     });
 
@@ -80,32 +77,36 @@ authRouter.post("/register", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.status(201).json({ success: true, token });
+    res.status(201).json({
+      success: true,
+      token
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// LOGIN
+/* ---------- LOGIN ---------- */
+/*
+Expected body:
+{
+  "username": "reva123",
+  "password": "password123"
+}
+*/
 authRouter.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
 
-    // ✅ Login validation
     if (!username || !password) {
-      return res
-        .status(400)
-        .json({ message: "Username and password are required" });
+      return res.status(400).json({
+        message: "username and password are required"
+      });
     }
 
     const user = await User.findOne({ username });
 
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
-
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
+    if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
@@ -115,20 +116,29 @@ authRouter.post("/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({ success: true, token });
+    res.json({
+      success: true,
+      token
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// ME
+/* ---------- ME ---------- */
+
 authRouter.get("/me", authenticateToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
+
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    res.json({ success: true, data: user });
+
+    res.json({
+      success: true,
+      data: user
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
