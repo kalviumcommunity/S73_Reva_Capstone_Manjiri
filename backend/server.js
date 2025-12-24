@@ -16,6 +16,9 @@ const PORT = process.env.PORT || 5000;
 /* ===================== MONGOOSE SAFETY CONFIG ===================== */
 mongoose.set('bufferCommands', false);
 
+mongoose.models = {};
+mongoose.modelSchemas = {};
+
 /* ===================== MIDDLEWARE ===================== */
 app.use(cors());
 app.use(express.json());
