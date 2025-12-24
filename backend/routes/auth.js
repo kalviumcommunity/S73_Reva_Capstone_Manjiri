@@ -1,6 +1,5 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
 
 const User = require("../models/User");
 
@@ -35,25 +34,40 @@ const authorizeRoles = (...roles) => {
 
 /* ===================== ROUTES ===================== */
 
-// REGISTER
+/* ---------- REGISTER ---------- */
+/*
+Expected body:
+{
+  "username": "reva123",
+  "email": "reva123@gmail.com",
+  "password": "password123",
+  "fullName": "Reva Sharma",
+  "role": "student"
+}
+*/
 authRouter.post("/register", async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { username, email, password, fullName, role } = req.body;
 
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "All fields required" });
+    if (!username || !email || !password || !fullName) {
+      return res.status(400).json({
+        message: "username, email, password and fullName are required"
+      });
     }
 
-    const exists = await User.findOne({ email });
+    const existingUser = await User.findOne({
+      $or: [{ email }, { username }]
+    });
 
-    if (exists) {
+    if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
     const user = await User.create({
-      name,
+      username,
       email,
-      password,
+      password, // 🔥 hashed automatically by model
+      fullName,
       role
     });
 
@@ -63,18 +77,34 @@ authRouter.post("/register", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.status(201).json({ success: true, token });
+    res.status(201).json({
+      success: true,
+      token
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// LOGIN
+/* ---------- LOGIN ---------- */
+/*
+Expected body:
+{
+  "username": "reva123",
+  "password": "password123"
+}
+*/
 authRouter.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    const user = await User.findOne({ email });
+    if (!username || !password) {
+      return res.status(400).json({
+        message: "username and password are required"
+      });
+    }
+
+    const user = await User.findOne({ username });
 
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({ message: "Invalid credentials" });
@@ -86,16 +116,32 @@ authRouter.post("/login", async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.json({ success: true, token });
+    res.json({
+      success: true,
+      token
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-// ME
+/* ---------- ME ---------- */
+
 authRouter.get("/me", authenticateToken, async (req, res) => {
-  const user = await User.findById(req.user.id).select("-password");
-  res.json({ success: true, data: user });
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      data: user
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 /* ===================== EXPORTS ===================== */
