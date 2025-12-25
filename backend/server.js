@@ -29,6 +29,9 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/documents', documentsRouter);
+app.use('/uploads', express.static("uploads"));
+app.use('/api/upload', require('./routes/upload'));
+
 
 /* ===================== SCHEMAS & MODELS ===================== */
 
