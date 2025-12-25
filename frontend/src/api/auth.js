@@ -14,10 +14,14 @@ API.interceptors.request.use((req) => {
 });
 
 export const registerUser = (data) =>
-  API.post("/register", data);
+  API.post("/auth/register", data);
 
 export const loginUser = (data) =>
-  API.post("/login", data);
+  API.post("/auth/login", data);
 
 export const getMe = () =>
-  API.get("/me");
+  API.get("/auth/me", {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });

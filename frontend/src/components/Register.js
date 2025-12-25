@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { registerUser } from "../api/auth";
+import "./Auth.css";
 
 const Register = () => {
   const [form, setForm] = useState({
@@ -32,6 +33,12 @@ const Register = () => {
       <input name="username" placeholder="Username" onChange={handleChange} />
       <input name="email" placeholder="Email" onChange={handleChange} />
       <input name="password" type="password" placeholder="Password" onChange={handleChange} />
+      <select name="role" onChange={handleChange}>
+        <option value="student">Student</option>
+        <option value="teacher">Teacher</option>
+        <option value="headmistress">Headmistress</option>
+        <option value="principal">Principal</option>
+      </select>
       <button type="submit">Register</button>
     </form>
   );

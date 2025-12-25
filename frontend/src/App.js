@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
+import Landing from "./components/Landing";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Dashboard from "./components/Dashboard";
@@ -16,21 +17,35 @@ function App() {
   return (
     <Router>
 
-      {/* Show Navbar only when logged in */}
+      {/* Navbar only after login */}
       {isAuthenticated && <Navbar />}
 
       <Routes>
-        {/* Default */}
+
+        {/* Opening page */}
         <Route
           path="/"
-          element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} />}
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Landing />
+          }
         />
 
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        {/* Public routes */}
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Login />
+          }
+        />
 
-        {/* Protected Routes */}
+        <Route
+          path="/register"
+          element={
+            isAuthenticated ? <Navigate to="/dashboard" /> : <Register />
+          }
+        />
+
+        {/* Protected routes */}
         <Route
           path="/dashboard"
           element={
@@ -57,6 +72,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
       </Routes>
     </Router>
   );
