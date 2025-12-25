@@ -1,0 +1,70 @@
+.document-list {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+}
+
+.document-card {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.document-card h3 {
+    margin-bottom: 5px;
+}
+
+.document-card p {
+    color: #555;
+}
+
+.category {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #555;
+    background: #e0e0e0;
+    padding: 3px 8px;
+    border-radius: 4px;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 6px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.btn-group {
+    margin-top: 10px;
+}
+
+button {
+    padding: 6px 12px;
+    margin-right: 8px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button.delete {
+    background-color: #e53935;
+    color: white;
+}
+
+button.cancel {
+    background-color: #9e9e9e;
+    color: white;
+}
+
+button:not(.delete):not(.cancel) {
+    background-color: #1976d2;
+    color: white;
+}
